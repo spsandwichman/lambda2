@@ -30,9 +30,9 @@ static void print_internal(Ref t, u32 db_offset, bool outer) {
         break;
     case APP:
         print_internal(app(t)->lam, db_offset, false);
-        if (app(t)->exp.kind != VAR) {
+        // if (app(t)->exp.kind != VAR) {
             printf(" ");
-        }
+        // }
         if (app(t)->exp.kind == APP) {
             printf("(");
             print_internal(app(t)->exp, db_offset, true);
