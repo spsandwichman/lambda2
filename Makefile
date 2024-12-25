@@ -20,7 +20,7 @@ INCLUDEPATHS = -Isrc/
 DEBUGFLAGS = -pg -g
 ASANFLAGS = -fsanitize=undefined -fsanitize=address
 CFLAGS = -MD -Wall -Wno-format -Wincompatible-pointer-types -Wno-discarded-qualifiers -Wno-deprecated-declarations -Wreturn-type
-OPT = -O3 -flto -march=native
+OPT = -O3 -ffast-math -flto -march=native
 
 FILE_NUM = 0
 

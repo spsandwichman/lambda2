@@ -20,10 +20,10 @@ void destroy(Ref t) {
     }
 }
 
-Ref inc_free(Ref input, usize depth, usize inc) {
+Ref inc_free(Ref input, isize depth, isize inc) {
     switch (input.kind) {
     case LAM:
-        Ref body = inc_free(lam(input)->lam, depth + 1, inc);
+        Ref body = inc_free(lam(input)->lam, depth+1, inc);
         lam(input)->lam = body;
         break;
     case APP:
@@ -43,7 +43,7 @@ Ref inc_free(Ref input, usize depth, usize inc) {
     return input;
 }
 
-Ref duplicate_inc_free(Ref input, usize depth, usize inc) {
+Ref duplicate_inc_free(Ref input, isize depth, isize inc) {
     Ref x;
 
     switch (input.kind) {
@@ -51,30 +51,31 @@ Ref duplicate_inc_free(Ref input, usize depth, usize inc) {
         x = new(LAM);
         Ref body = duplicate_inc_free(lam(input)->lam, depth + 1, inc);
         lam(x)->lam = body;
-        return x;
+        break;
     case APP:
         x = new(APP);
         Ref l = duplicate_inc_free(app(input)->lam, depth, inc);
         Ref e = duplicate_inc_free(app(input)->exp, depth, inc);
         app(x)->lam = l;
         app(x)->exp = e;
-        return x;
+        break;
     case VAR:
-        x.kind = VAR;
+        x = new(VAR);
         x.index = input.index;
         if (x.index >= depth) {
             x.index += inc;
         }
-        return x;
+        break;
     default:
         unreachable;
     }
+    return x;
 }
 
 static usize num_bound = 0;
 static usize inc_offset = 0;
 
-Ref traverse(Ref body, Ref input, usize depth) {
+Ref traverse(Ref body, Ref input, isize depth) {
     switch (body.kind) {
     case LAM:
         Ref new_body = traverse(lam(body)->lam, input, depth + 1);
@@ -88,14 +89,14 @@ Ref traverse(Ref body, Ref input, usize depth) {
         break;
     case VAR:
         if (body.index == depth) {
-            ++num_bound;
-            if (num_bound == 1) {
-                input = inc_free(input, 1, depth - 1);
-                inc_offset = depth - 1;
-                return input;
-            }
-            return duplicate_inc_free(input, 1, (depth - 1) - inc_offset);
-            // return duplicate_inc_free(input, 1, depth - 1);
+            num_bound++;
+            // if (num_bound == 1) {
+            //     input = inc_free(input, 1, depth - 1);
+            //     inc_offset = depth - 1;
+            //     return input;
+            // }
+            // return duplicate_inc_free(input, 1, (depth - 1) - inc_offset);
+            return duplicate_inc_free(input, 1, depth - 1);
         }
         if (body.index > depth) {
             body.index--;
@@ -123,7 +124,8 @@ Ref beta(Ref t) {
 
     M = traverse(M, N, 1);
 
-    if (num_bound == 0) destroy(N);
+    // if (num_bound == 0) 
+    destroy(N);
     expire(app(t)->lam);
     expire(t);
 

@@ -4,33 +4,37 @@
 int main() {
     init();
 
-    Ref l = 
-        parse("(λx.xxx) (λx.xxx)");
-        // parse("(λxy.x(x(xy))) (λxy.x(x(xy))) (λxy.x(x(xy)))");
-        // parse("(λxy.x(x(xy))) λxy.x(x(xy))");
-        // parse(MUL N1 N2);
-        // parse("λxy.(λzw.z (z w)) x y");
+    // char* text = MUL N100 N10;
+    // char* text = IFTHEN FALSE N2 N3;
+    char* text = "(\\x.xxx) (\\x.xxx)";
 
-    // print_debruijn(l);
-    // putchar('\n');
-    print(l);
-    putchar('\n');
+    printf("%s\n", text);
 
+    Ref l = parse(text);
+
+    // print(l);
+    // printf("\n");
+    print_debruijn(l);
+    printf("\n");
+    usize steps = 0;
     do {
         l = reduce(l);
         // l = pool_condense(l);
         
-        // print_debruijn(l);
         // print(l);
-        // putchar('\n');
+        // printf("\n");
+        // print_debruijn(l);
+        // printf("\n");
 
-        float percent_free = pool.slots_free/(float)pool.len;
-        if (percent_free >= .333) {
+        double percent_free = (pool.slots_free*1.)/(pool.cap);
+        printf("% 5d/% 5d (% 2f%% free)\n", pool.len - pool.slots_free, pool.cap, percent_free*100);
+        if (percent_free >= .50) {
             l = pool_condense(l);
         }
-        printf("%p %d/%d (%f%% free)\n", pool.refs, pool.len, pool.cap, percent_free * 100.0);
+        steps++;
     } while (did_beta);
 
     print(l);
-    putchar('\n');
+    printf("\n");
+
 }
