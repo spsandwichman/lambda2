@@ -1,0 +1,14 @@
+lambda = '\\' | 'λ';
+
+var = 'a' | 'b' | 'c' | ... ;
+
+def = var def
+    | var '.' expr
+    ;
+
+term = lambda def (* definition *)
+     | var (* variable *)
+     | '(' expr ')'
+     ;
+
+expr = term | expr term;
